@@ -1,0 +1,8 @@
+body{
+    background-color: white;
+    color: black;
+    text-align: center;
+    min-height: 100vh;
+    font-size: 3em;
+    align-items: center;
+}
