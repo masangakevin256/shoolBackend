@@ -37,6 +37,9 @@ app.use("/teachers", require("./routes/teachers"));
 app.use("/students", require("./routes/students"));
 app.use("/admins", require("./routes/admins"));
 app.use("/parents", require("./routes/parents"));
+
+//for auth me
+app.use("/authMe", require("./routes/authMe.js"))
 //for refresh tokens
 app.use("/refresh/parents", require("./routes/parentsRefresh"));
 app.use("/refresh/teachers", require("./routes/teachersRefresh"));

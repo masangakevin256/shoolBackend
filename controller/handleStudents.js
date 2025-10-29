@@ -2,18 +2,32 @@ const {getDb} = require("../model/schoolDb");
 const {format} = require("date-fns");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
-const getAllStudents =  async (req,res) => {
-    const db = getDb();
-    if(!db) return res.status(404).json({"message": "Database not initialized"});
+const getAllStudents = async (req, res) => {
+  const user = req.user; // logged-in user
+  const db = getDb();
+  if (!db) return res.status(404).json({ message: "Database not initialized" });
 
-    try {
-        const students = await db.collection("students").find().toArray();
-        res.status(200).json(students);
-    } catch (error) {
-        res.status(500).json({"message": "Failed to fetch students"});
-        
+  try {
+    let students;
+
+    // If the logged-in user is a parent, only fetch their own children
+    if (user.roles === "parent") {
+      students = await db.collection("students")
+        .find({ parentName: user.username })
+        .toArray();
+    } 
+    // If it's not a parent (e.g. admin, teacher), fetch all
+    else {
+      students = await db.collection("students").find().toArray();
     }
-}
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ message: "Failed to fetch students" });
+  }
+};
+
 const addNewStudent = async (req,res) => {
     let totalAmountPaid = 0;
     let totalFees = 50000;
@@ -28,26 +42,42 @@ const addNewStudent = async (req,res) => {
     ]
     // we should also calculate grade from marks
     const db = getDb();
-    const {username , password, admissionNumber} = req.body;
+    const {username} = req.body;
     if(!db) return res.status(404).json({"message": "Database not initialized"});
-    if(!username || !password || !admissionNumber){
-        return res.status(400).json({"message": "username, password and admission number required"})
+    if(!username){
+        return res.status(400).json({"message": "username and required"})
     }
     
     try {
         //check for duplicates
         const duplicateUsername = await db.collection("students").findOne({username: username});
-        const duplicateAdmissionNumber = await db.collection("students").findOne({admissionNumber: admissionNumber});
+
         
         if(duplicateUsername) return res.status(409).json({"message": `Student with username ${username} already exists`});
-        if(duplicateAdmissionNumber) return res.status(409).json({"message": `Student with admission number ${admissionNumber} already exists`});
-        //hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const lastStudent = await db.collection("students")
+            .find()
+            .sort({ admissionNumber: -1 })
+            .limit(1)
+            .toArray();
+
+        let admissionNumber;
+
+        if (lastStudent.length === 0) {
+        // No students yet → start with 1
+        admissionNumber = 1;
+        } else {
+        // Take the last student's admissionNumber and increment by 1
+        // Convert to number before incrementing
+             const lastNum = parseInt(lastStudent[0].admissionNumber);
+            admissionNumber = String(lastNum + 1);
+        }
+
+        
+       
         // create a student format object
         const studentFormat ={
             "username": username,
             "admissionNumber": admissionNumber,
-            "password":hashedPassword,
             "totalFees": totalFees,
             "roles": roles,
             "totalAmountPaid": totalAmountPaid,

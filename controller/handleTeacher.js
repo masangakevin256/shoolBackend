@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 const getAllTeachers =  async (req,res) => {
     const db = getDb();
+    const user = req.user; 
     if(!db) return res.status(404).json({"message": "Database not initialized"});
 
     try {
