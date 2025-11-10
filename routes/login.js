@@ -3,9 +3,9 @@ const router = express.Router();
 const handleLogin = require("../controller/controlLogin");
 
 // Define each login route separately
-router.post("/parents", handleLogin.handleParentsLogin);
-router.post("/teachers", handleLogin.handleTeachersLogin);
-router.post("/admins", handleLogin.handleAdminLogin);
+router.post("/parent", handleLogin.handleParentsLogin);
+router.post("/teacher", handleLogin.handleTeachersLogin);
+router.post("/admin", handleLogin.handleAdminLogin);
 
 module.exports = router;
 

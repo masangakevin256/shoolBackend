@@ -8,8 +8,8 @@ const addNewTeacher = async (req,res) => {
     const db = getDb();
     const {email, username, password, phoneNumber, secretReg} = req.body;
     if(!db) return res.status(404).json({"message": "Database not initialized"});
-    if(!email || !username || !password || !phoneNumber  || !secretReg){
-        return res.status(400).json({"message": "Email, username, password, secret registration required phone number required"})
+    if(!email || !username || !password || !secretReg ){
+        return res.status(400).json({"message": "Email, username, password,  required required"})
     }
     
     try {
@@ -39,11 +39,11 @@ const addNewTeacher = async (req,res) => {
                 teacherId = "TC" + nextNum;
             }
 
-        //check if used code is good
+        // check if used code is good
          const usedAdminCode = await db.collection("admins").findOne({adminId: secretReg });
 
          if(!usedAdminCode) return res.status(400).json({"message": "Invalid secret registration number"})
-        //check for duplicates
+            // check for duplicates
         const duplicate = await db.collection("teachers").findOne({username: username}, {email: email});
         
         if(duplicate) return res.status(409).json({"message": `Teacher ${username} already exists`});
@@ -113,7 +113,7 @@ const addNewTeacher = async (req,res) => {
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
                                     <p style="color: #64748b; margin: 0 0 5px 0; font-size: 12px; font-weight: 500;">REGISTERED BY</p>
-                                    <p style="color: #1e293b; margin: 0; font-size: 16px; font-weight: 600;">${usedAdminCode.username}</p>
+                                   
                                 </div>
                                 <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
                                     <p style="color: #64748b; margin: 0 0 5px 0; font-size: 12px; font-weight: 500;">ACCOUNT CREATED</p>
