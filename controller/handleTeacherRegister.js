@@ -6,9 +6,9 @@ const { ObjectId } = require("mongodb");
 const addNewTeacher = async (req,res) => {
     const sendEmail = require("../utils/sendEmail")
     const db = getDb();
-    const {email, username, password, phoneNumber, secretReg} = req.body;
+    const {email, username, password} = req.body;
     if(!db) return res.status(404).json({"message": "Database not initialized"});
-    if(!email || !username || !password || !secretReg ){
+    if(!email || !username || !password ){
         return res.status(400).json({"message": "Email, username, password,  required required"})
     }
     
@@ -40,9 +40,9 @@ const addNewTeacher = async (req,res) => {
             }
 
         // check if used code is good
-         const usedAdminCode = await db.collection("admins").findOne({adminId: secretReg });
+        // const usedAdminCode = await db.collection("admins").findOne({adminId: secretReg });
 
-         if(!usedAdminCode) return res.status(400).json({"message": "Invalid secret registration number"})
+        //  if(!usedAdminCode) return res.status(400).json({"message": "Invalid secret registration number"})
             // check for duplicates
         const duplicate = await db.collection("teachers").findOne({username: username}, {email: email});
         
@@ -56,8 +56,8 @@ const addNewTeacher = async (req,res) => {
             "password": hashedPassword,
             "teacherId": teacherId,
             "roles": "teacher",
-            "phoneNumber": phoneNumber,
-            "registeredBy": usedAdminCode.username,
+            // "phoneNumber": phoneNumber,
+            // "registeredBy": usedAdminCode.username,
             "paidAmount": 50000,
             "createdAt": `${format(new Date() ,"yyyy/MM/dd  HH:mm:ss")}`,
         }

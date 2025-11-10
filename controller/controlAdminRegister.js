@@ -7,18 +7,18 @@ const addNewAdmin = async (req,res) => {
     const sendEmail = require("../utils/sendEmail");
     const roles = "admin"
     const db = getDb();
-    const {email, username , password, secretReg  } = req.body;
+    const {email, username , password  } = req.body;
     if(!db) return res.status(404).json({"message": "Database not initialized"});
-    if(!email || !username || !password || !secretReg){
+    if(!email || !username || !password){
         return res.status(400).json({"message": "email, username, password secret registration number and phone number required"})
     }
     
     try {
         // check if he has the correct secret code to register
-        const usedAdminCode = await db.collection("admins").findOne({adminId: secretReg});
-        if(!usedAdminCode){
-            return res.status(400).json({"message": "Failed to verify secret registration number"});
-        }
+        // const usedAdminCode = await db.collection("admins").findOne({adminId: secretReg});
+        // if(!usedAdminCode){
+        //     return res.status(400).json({"message": "Failed to verify secret registration number"});
+        // }
         // check for duplicates
         const duplicateUsernameEmail = await db.collection("admins").findOne({email: email}, {username: username});
 
@@ -60,7 +60,7 @@ const addNewAdmin = async (req,res) => {
             "amountPaid": 100000,
             // "phoneNumber": phoneNumber,
             "roles": roles,
-            "registeredBy": usedAdminCode.username,
+            // "registeredBy": usedAdminCode.username,
             "createdAt": `${format(new Date() ,"yyyy/MM/dd  HH:mm:ss")}`,
         }
         // await sendEmail(
