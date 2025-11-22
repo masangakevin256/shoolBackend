@@ -10,9 +10,9 @@ const addNewParent = async (req,res) => {
     
     const {email, username, password, phoneNumber, studentAdmissionNumber, studentUsername} = req.body;
     if(!db) return res.status(404).json({"message": "Database not initialized"});
-    if(!email || !username || !password || !phoneNumber || !studentAdmissionNumber || !studentUsername){
-        return res.status(400).json({"message": "Email, username, password, phone number student admission number and student username required"})
-    }
+    // if(!email || !username || !password || !phoneNumber || !studentAdmissionNumber || !studentUsername){
+    //     return res.status(400).json({"message": "Email, username, password, phone number student admission number and student username required"})
+    // }
     
     try {
 
